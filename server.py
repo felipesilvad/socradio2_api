@@ -5,7 +5,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from datetime import datetime
-import time
+import threading
 
 cred = credentials.Certificate("./firebaseKey.json")
 firebase_admin.initialize_app(cred)
@@ -19,15 +19,13 @@ docs = (
   .stream()
 )
 
-current_playlist = []
-
+playlist = []
 for doc in docs:
-  current_playlist.append({'id': doc.id, 'secs': doc.to_dict()['secs']})
-
-# def createToken():
-#   grant = livekit.VideoGrant(room_join=True, room="My Cool Room")
-#   token = livekit.AccessToken(os.environ.get("LK_API_KEY"), os.environ.get("LK_API_SECRET"), grant=grant, identity="bob", name="Bob")
-#   print(token)
+  playlist.append({'id': doc.id, 'secs': doc.to_dict()['secs'], 'title': doc.to_dict()['title']})
+  
+currentSongIndex = 0
+currentSong = playlist[currentSongIndex]
+  
 
 @app.get("/")
 def home():
@@ -35,14 +33,19 @@ def home():
 
 @app.get('/getCurrentSong')
 def getCurrentSong():
-  # value = {}
-  # for song in current_playlist:
-  #   currentsongID = song['id']
-  #   value = {"id":currentsongID,'startTime':datetime.now()}
-  #   time.sleep(song['secs'])
-  # return value
+  global currentSongIndex
+  global playlist
+  currentSong = playlist[currentSongIndex]
+  
+  timer = threading.Timer(currentSong['secs'], getCurrentSong)
+  timer.start()
+    
+  currentSongIndex = currentSongIndex+1
+  
   now = datetime.now()
-  return {"id":"lVAj1qbpABl2BMETNpWt", "timeStart": now}
+  print({"id":currentSong['id'], "timeStart": now, "title":currentSong['title']})
+  return {"id":currentSong['id'], "timeStart": now, "title":currentSong['title']}
 
 if __name__ == "__main__":
+  # getCurrentSong()
   app.run(debug=True)
