@@ -6,7 +6,8 @@ config = {
   'projectId': "soc-radio-f3953",
   'storageBucket': "soc-radio-f3953.appspot.com",
   'messagingSenderId': "533854826784",
-  'appId': "1:533854826784:web:87df494b5a2ecab4526745"
+  'appId': "1:533854826784:web:87df494b5a2ecab4526745",
+  "databaseURL": "https://soc-radio-f3953.firebaseio.com"
 }
 
 firebase = pyrebase.initialize_app(config)

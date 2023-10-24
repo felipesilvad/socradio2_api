@@ -25,27 +25,21 @@ for doc in docs:
   
 currentSongIndex = 0
 currentSong = playlist[currentSongIndex]
-  
+now = datetime.now()
 
-@app.get("/")
-def home():
-  return "SoC Radio"
+def changeSong():
+  global currentSongIndex
+  timer = threading.Timer(currentSong['secs'], changeSong)
+  timer.start()
+  currentSongIndex = currentSongIndex+1
+
+changeSong()
 
 @app.get('/getCurrentSong')
 def getCurrentSong():
-  global currentSongIndex
-  global playlist
-  currentSong = playlist[currentSongIndex]
-  
-  timer = threading.Timer(currentSong['secs'], getCurrentSong)
-  timer.start()
-    
-  currentSongIndex = currentSongIndex+1
-  
-  now = datetime.now()
   print({"id":currentSong['id'], "timeStart": now, "title":currentSong['title']})
   return {"id":currentSong['id'], "timeStart": now, "title":currentSong['title']}
 
 if __name__ == "__main__":
-  # getCurrentSong()
-  app.run(debug=True)
+  getCurrentSong()
+  # app.run(debug=True)
