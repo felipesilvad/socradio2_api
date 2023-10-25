@@ -29,7 +29,7 @@ currentSong = {}
 def changeSong(currentSongIndex, currentSong):
   currentSongIndex += 1
   currentSong = playlist[currentSongIndex]
-  currentSong.startTime = datetime.now()
+  # currentSong.startTime = datetime.now()
 
   print("New song index: ", currentSongIndex)
   print("Starting song: ", currentSong)
@@ -40,8 +40,8 @@ def changeSong(currentSongIndex, currentSong):
 
 changeSong(currentSongIndex, currentSong)
 
-@app.get('/getCurrentSong')
-def currentSong():
+@app.get('/currentSong')
+def getCurrentSong():
   return currentSong
 
 if __name__ == "__main__":
