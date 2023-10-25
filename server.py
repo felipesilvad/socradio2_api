@@ -20,29 +20,29 @@ docs = (
 
 playlist = []
 for doc in docs:
-  playlist.append({'id': doc.id, 'secs': doc.to_dict()['secs'], 'title': doc.to_dict()['title']})
+  song = doc.to_dict()
+  playlist.append(song)
   
-currentSongIndex = 0
-now = datetime.now()
+currentSongIndex = -1
+currentSong = {}
 
-timer = threading.Timer(getCurrentSong()['secs'], changeSong, [currentSongIndex])
-timer.start()
-
-def getCurrentSong():
-  return playlist[currentSongIndex]
-
-def changeSong(currentSongIndex):
-  secs = getCurrentSong()['secs']
+def changeSong(currentSongIndex, currentSong):
   currentSongIndex += 1
-  currentSong = getCurrentSong()
-  
-  print("on changeSong - ",{"id":currentSong['id'], "timeStart": now, "title":currentSong['title']})
-  timer = threading.Timer(secs, changeSong, [currentSongIndex])
+  currentSong = playlist[currentSongIndex]
+  currentSong.startTime = datetime.now()
+
+  print("New song index: ", currentSongIndex)
+  print("Starting song: ", currentSong)
+  print("Next song in ", currentSong["secs"] , " seconds")
+
+  timer = threading.Timer(currentSong["secs"], changeSong, [currentSongIndex, currentSong])
   timer.start()
+
+changeSong(currentSongIndex, currentSong)
 
 @app.get('/getCurrentSong')
 def currentSong():
-  return getCurrentSong()
+  return currentSong
 
 if __name__ == "__main__":
   # getCurrentSong()
