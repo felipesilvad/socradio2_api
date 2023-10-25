@@ -1,4 +1,3 @@
-# server.py
 from flask import Flask
 from flask_cors import CORS
 import firebase_admin
@@ -23,21 +22,23 @@ playlist = []
 for doc in docs:
   playlist.append({'id': doc.id, 'secs': doc.to_dict()['secs'], 'title': doc.to_dict()['title']})
   
-currentSongIndex = -1
+currentSongIndex = 0
 now = datetime.now()
+
+timer = threading.Timer(getCurrentSong()['secs'], changeSong, [currentSongIndex])
+timer.start()
 
 def getCurrentSong():
   return playlist[currentSongIndex]
 
 def changeSong(currentSongIndex):
-  currentSong = getCurrentSong()
+  secs = getCurrentSong()['secs']
   currentSongIndex += 1
-  timer = threading.Timer(currentSong['secs'], changeSong, [currentSongIndex])
-  timer.start()
+  currentSong = getCurrentSong()
   
   print("on changeSong - ",{"id":currentSong['id'], "timeStart": now, "title":currentSong['title']})
-
-changeSong(currentSongIndex)
+  timer = threading.Timer(secs, changeSong, [currentSongIndex])
+  timer.start()
 
 @app.get('/getCurrentSong')
 def currentSong():
