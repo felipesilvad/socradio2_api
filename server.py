@@ -24,26 +24,30 @@ for doc in docs:
   playlist.append(song)
   
 currentSongIndex = -1
-currentSong = {}
+currentSong = None
 
-def changeSong(currentSongIndex, currentSong):
+def changeSong():
+  global currentSongIndex, currentSong
   currentSongIndex += 1
-  currentSong = playlist[currentSongIndex]
-  # currentSong.startTime = datetime.now()
 
-  print("New song index: ", currentSongIndex)
+  if currentSongIndex == len(playlist):
+    currentSongIndex = 0
+
+  currentSong = playlist[currentSongIndex]
+  currentSong['startTime'] = time.time()
+
+  print("\n")
   print("Starting song: ", currentSong)
   print("Next song in ", currentSong["secs"] , " seconds")
 
-  timer = threading.Timer(currentSong["secs"], changeSong, [currentSongIndex, currentSong])
+  timer = threading.Timer(currentSong["secs"], changeSong)
   timer.start()
-
-changeSong(currentSongIndex, currentSong)
 
 @app.get('/currentSong')
 def getCurrentSong():
+  global currentSong
   return currentSong
 
 if __name__ == "__main__":
-  # getCurrentSong()
+  changeSong()
   app.run(debug=True)
