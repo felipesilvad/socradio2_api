@@ -21,7 +21,7 @@ docs = (
 playlist = []
 for doc in docs:
   song = doc.to_dict()
-  playlist.append(song)
+  playlist.append({"id":doc.id, "data":song})
   
 currentSongIndex = -1
 currentSong = None
@@ -38,9 +38,9 @@ def changeSong():
 
   print("\n")
   print("Starting song: ", currentSong)
-  print("Next song in ", currentSong["secs"] , " seconds")
+  print("Next song in ", currentSong["data"]["secs"] , " seconds")
 
-  timer = threading.Timer(currentSong["secs"], changeSong)
+  timer = threading.Timer(currentSong["data"]["secs"], changeSong)
   timer.start()
 
 @app.get('/currentSong')
