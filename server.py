@@ -3,7 +3,7 @@ from flask_cors import CORS
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-from datetime import datetime
+import time
 import threading
 
 cred = credentials.Certificate("./firebaseKey.json")
