@@ -35,6 +35,7 @@ def changeSong():
 
   currentSong = playlist[currentSongIndex]
   currentSong['startTime'] = time.time()
+  currentSong['index'] = currentSongIndex
 
   print("\n")
   print("Starting song: ", currentSong)
@@ -43,10 +44,15 @@ def changeSong():
   timer = threading.Timer(currentSong["data"]["secs"], changeSong)
   timer.start()
 
-@app.get('/currentSong')
+@app.get('/currentSongMain')
 def getCurrentSong():
   global currentSong
   return currentSong
+
+@app.get('/playlistMain')
+def getPlaylist():
+  global playlist
+  return playlist
 
 if __name__ == "__main__":
   changeSong()
