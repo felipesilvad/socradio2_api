@@ -14,7 +14,7 @@ CORS(app)
 
 docs = (
   db.collection("songs")
-  # .where('timeslots', 'array_contains', '3 AM (EST)')
+  .where('main', '==', True)
   .stream()
 )
 
@@ -33,15 +33,21 @@ def changeSong():
   if currentSongIndex == len(playlist):
     currentSongIndex = 0
 
-  currentSong = playlist[currentSongIndex]
-  currentSong['startTime'] = time.time()
-  currentSong['index'] = currentSongIndex
+  # currentSong = playlist[currentSongIndex]
+  # currentSong['startTime'] = time.time()
+  # currentSong['index'] = currentSongIndex
+
+  currentSong = {"index":currentSongIndex, 
+                 "startTime": time.time(),
+                 "secs":playlist[currentSongIndex]["data"]["secs"]
+                 }
 
   print("\n")
+  print("--MAIN--")
   print("Starting song: ", currentSong)
-  print("Next song in ", currentSong["data"]["secs"] , " seconds")
+  print("Next song in ", currentSong["secs"] , " seconds")
 
-  timer = threading.Timer(currentSong["data"]["secs"], changeSong)
+  timer = threading.Timer(currentSong["secs"], changeSong)
   timer.start()
 
 @app.get('/currentSongMain')
@@ -54,6 +60,57 @@ def getPlaylist():
   global playlist
   return playlist
 
+docsChill = (
+  db.collection("songs")
+  # .where('timeslots', 'array_contains', '3 AM (EST)')
+  .where('lv', '<', 3)
+  .stream()
+
+)
+
+playlistChill = []
+for doc in docsChill:
+  song = doc.to_dict()
+  playlistChill.append({"id":doc.id, "data":song})
+  
+currentSongChillIndex = -1
+currentSongChill = None
+
+def changeSongChill():
+  global currentSongChillIndex, currentSongChill
+  currentSongChillIndex += 1
+
+  if currentSongChillIndex == len(playlistChill):
+    currentSongChillIndex = 0
+
+  # currentSongChill = playlistChill[currentSongChillIndex]
+  # currentSongChill['startTime'] = time.time()
+  # currentSongChill['index'] = currentSongChillIndex
+
+  currentSongChill = {"index":currentSongChillIndex, 
+                 "startTime": time.time(),
+                 "secs":playlistChill[currentSongChillIndex]["data"]["secs"]
+                 }
+
+  print("\n")
+  print("--Chill--")
+  print("Starting song: ", currentSongChill)
+  print("Next song in ", currentSongChill["secs"] , " seconds")
+
+  timer = threading.Timer(currentSongChill["secs"], changeSongChill)
+  timer.start()
+
+@app.get('/currentSongChill')
+def getCurrentSongChill():
+  global currentSongChill
+  return currentSongChill
+
+@app.get('/playlistChill')
+def getPlaylistChill():
+  global playlistChill
+  return playlistChill
+
 if __name__ == "__main__":
   changeSong()
+  changeSongChill()
   app.run(debug=True)
