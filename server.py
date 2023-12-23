@@ -49,10 +49,13 @@ def changeSong():
 
   timer = threading.Timer(currentSong["secs"], changeSong)
   timer.start()
+  
+print(currentSong)
 
 @app.get('/currentSongMain')
 def getCurrentSong():
   global currentSong
+  print(currentSong)
   return currentSong
 
 @app.get('/playlistMain')
@@ -60,12 +63,14 @@ def getPlaylist():
   global playlist
   return playlist
 
+
+# CHILL STATION
+
 docsChill = (
   db.collection("songs")
   # .where('timeslots', 'array_contains', '3 AM (EST)')
   .where('lv', '<', 3)
   .stream()
-
 )
 
 playlistChill = []
@@ -110,7 +115,60 @@ def getPlaylistChill():
   global playlistChill
   return playlistChill
 
+# EVENT STATION
+currentPlaylist = {"label": "Christmas", "value": "hCD23wq9kp7tv3y6jr4N"}
+
+docsEvent = (
+  db.collection("songs")
+  .where('playlists', 'array_contains', currentPlaylist)
+  .stream()
+)
+
+playlistEvent = []
+for doc in docsEvent:
+  song = doc.to_dict()
+  playlistEvent.append({"id":doc.id, "data":song})
+  
+currentSongEventIndex = -1
+currentSongEvent = None
+
+def changeSongEvent():
+  global currentSongEventIndex, currentSongEvent
+  currentSongEventIndex += 1
+
+  if currentSongEventIndex == len(playlistEvent):
+    currentSongEventIndex = 0
+
+  # currentSongEvent = playlistEvent[currentSongEventIndex]
+  # currentSongEvent['startTime'] = time.time()
+  # currentSongEvent['index'] = currentSongEventIndex
+
+  currentSongEvent = {"index":currentSongEventIndex, 
+                 "startTime": time.time(),
+                 "secs":playlistEvent[currentSongEventIndex]["data"]["secs"]
+                 }
+
+  print("\n")
+  print("--Event--")
+  print("Starting song: ", currentSongEvent)
+  print("Next song in ", currentSongEvent["secs"] , " seconds")
+
+  timer = threading.Timer(currentSongEvent["secs"], changeSongEvent)
+  timer.start()
+
+@app.get('/currentSongEvent')
+def getCurrentSongEvent():
+  global currentSongEvent
+  return currentSongEvent
+
+@app.get('/playlistEvent')
+def getPlaylistEvent():
+  global playlistEvent
+  return playlistEvent
+
+
 if __name__ == "__main__":
   changeSong()
   changeSongChill()
+  changeSongEvent()
   app.run(debug=True)
